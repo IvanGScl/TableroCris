@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tablero de Comunicación - Cristóbal</title>
+    <title>Tablero - Cristóbal</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -39,12 +39,7 @@
             text-align: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             cursor: pointer;
-            border: 2px solid #e5e7eb;
-            user-select: none;
-        }
-        .card:active {
-            transform: scale(0.95);
-            background-color: #f3f4f6;
+            border: 2px solid #cbd5e1;
         }
         .card-icon {
             font-size: 3.5rem;
@@ -94,17 +89,43 @@
 </head>
 <body>
 
-    <h1>Comunicación Cotidiana v14</h1>
-    <p>Selecciona una opción</p>
+    <h1>Comunicación v15 (Actualizado)</h1>
+    <p>Toca una tarjeta</p>
 
-    <div class="grid" id="cardGrid"></div>
+    <!-- Grilla fija en HTML para asegurar que los clics respondan de inmediato -->
+    <div class="grid">
+        <div class="card" onclick="abrir('Jugo', '🥤', 'audios/jugo_f.mp3')">
+            <div class="card-icon">🥤</div>
+            <div class="card-title">Jugo</div>
+        </div>
+        <div class="card" onclick="abrir('Pan', '🥙', 'audios/pan_f.mp3')">
+            <div class="card-icon">🥙</div>
+            <div class="card-title">Pan</div>
+        </div>
+        <div class="card" onclick="abrir('Tele', '🖥️', 'audios/tv_f.mp3')">
+            <div class="card-icon">🖥️</div>
+            <div class="card-title">Tele</div>
+        </div>
+        <div class="card" onclick="abrir('Dormir', '🛌', 'audios/dormir_f.mp3')">
+            <div class="card-icon">🛌</div>
+            <div class="card-title">Dormir</div>
+        </div>
+        <div class="card" onclick="abrir('Baño', '🚽', 'audios/bano_f.mp3')">
+            <div class="card-icon">🚽</div>
+            <div class="card-title">Baño</div>
+        </div>
+        <div class="card" onclick="abrir('Te amo', '🥰', 'audios/teamo_f.mp3')">
+            <div class="card-icon">🥰</div>
+            <div class="card-title">Te amo</div>
+        </div>
+    </div>
 
     <!-- Modal -->
     <div class="modal" id="myModal">
         <div class="modal-content">
             <div id="mIcon" style="font-size: 4rem;">🥤</div>
             <h2 id="mTitle" style="font-size: 2.2rem; color: #2563eb; margin: 10px 0;">Jugo</h2>
-            <p style="color: #4b5563; font-size: 1.1rem;">Toca el botón verde para hablar:</p>
+            <p style="color: #4b5563; font-size: 1.1rem;">Toca el botón verde:</p>
             
             <button class="btn" onclick="lanzarFrase()">✨ ¡Lo intenté!</button>
             <button class="btn btn-close" onclick="cerrarModal()">Cancelar</button>
@@ -112,46 +133,15 @@
     </div>
 
     <script>
-        const items = [
-            { id: 1, title: "Jugo", icon: "🥤", frase: "Quiero tomar jugo", audio: "audios/jugo_f.mp3" },
-            { id: 2, title: "Pan", icon: "🥙", frase: "Quiero comer pan", audio: "audios/pan_f.mp3" },
-            { id: 3, title: "Tele", icon: "🖥️", frase: "Quiero ver Televisión", audio: "audios/tv_f.mp3" },
-            { id: 4, title: "Dormir", icon: "🛌", frase: "Quiero ir a dormir", audio: "audios/dormir_f.mp3" },
-            { id: 5, title: "Baño", icon: "🚽", frase: "Quiero ir al baño", audio: "audios/bano_f.mp3" },
-            { id: 6, title: "Te amo", icon: "🥰", frase: "Te amo", audio: "audios/teamo_f.mp3" }
-        ];
-
-        let itemActual = null;
-        const grid = document.getElementById('cardGrid');
+        let audioActualPath = "";
         const modal = document.getElementById('myModal');
         const mTitle = document.getElementById('mTitle');
         const mIcon = document.getElementById('mIcon');
 
-        function iniciar() {
-            grid.innerHTML = "";
-            items.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'card';
-                div.innerHTML = `
-                    <div class="card-icon">${item.icon}</div>
-                    <div class="card-title">${item.title}</div>
-                `;
-                
-                // Usamos tanto 'click' como 'touchend' para asegurar respuesta inmediata en pantallas táctiles y PC
-                div.addEventListener('click', () => abrirModal(item));
-                div.addEventListener('touchend', (e) => {
-                    e.preventDefault(); // Evita retrasos de doble toque en móviles
-                    abrirModal(item);
-                });
-
-                grid.appendChild(div);
-            });
-        }
-
-        function abrirModal(item) {
-            itemActual = item;
-            mTitle.innerText = item.title;
-            mIcon.innerText = item.icon;
+        function abrir(titulo, icono, audioRuta) {
+            mTitle.innerText = titulo;
+            mIcon.innerText = icono;
+            audioActualPath = audioRuta;
             modal.style.display = 'flex';
         }
 
@@ -161,15 +151,13 @@
 
         function lanzarFrase() {
             cerrarModal();
-            if (itemActual && itemActual.audio) {
-                const reproductor = new Audio(itemActual.audio);
+            if (audioActualPath) {
+                const reproductor = new Audio(audioActualPath);
                 reproductor.play().catch(err => {
                     console.log("Error de audio:", err);
                 });
             }
         }
-
-        iniciar();
     </script>
 </body>
 </html>
