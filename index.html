@@ -130,7 +130,7 @@
 <body>
 
     <header>
-        <h1>Comunicación Cotidiana v4</h1>
+        <h1>Comunicación Cotidiana v5</h1>
         <p class="subtitle">Selecciona lo que necesitas</p>
     </header>
 
@@ -145,22 +145,21 @@
                 <h2 id="modalWord">Jugo</h2>
             </div>
             
-            <!-- Botón para escuchar el audio grabado de la palabra -->
-            <button class="btn btn-audio" onclick="playAudioPrompt()">🔊 Escuchar palabra (Grabada)</button>
+            <!-- Botón opcional por si quiere volver a escuchar la palabra -->
+            <button class="btn btn-audio" onclick="playAudioPrompt()">🔊 Repetir palabra</button>
             
-            <!-- Botón de validación para reproducir la frase completa grabada -->
+            <!-- Botón de validación para reproducir la frase completa -->
             <button class="btn btn-success" onclick="validateAndPlayPhrase()">✨ ¡Lo intenté! (Frase completa)</button>
             <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
         </div>
     </div>
 
     <script>
-        // Aquí puedes enlazar tus propios archivos de audio subidos a GitHub (ej: 'audio/jugo_palabra.mp3')
         const items = [
             { id: 1, title: "Jugo", icon: "🥤", audioPrompt: "audios/jugo_p.mp3", audioPhrase: "audios/jugo_f.mp3" },
             { id: 2, title: "Pan", icon: "🥙", audioPrompt: "audios/pan_p.mp3", audioPhrase: "audios/pan_f.mp3" },
-            { id: 3, title: "Tele", icon: "🖥️", audioPrompt: "audios/tv_p.mp3", audioPhrase: "audios/tv_f.mp3" },
-            { id: 4, title: "Cama", icon: "🛌", audioPrompt: "audios/dormir_p.mp3", audioPhrase: "audios/cama_f.mp3" },
+            { id: 3, title: "TV", icon: "🖥️", audioPrompt: "audios/tv_p.mp3", audioPhrase: "audios/tv_f.mp3" },
+            { id: 4, title: "Dormir", icon: "🛌", audioPrompt: "audios/dormir_p.mp3", audioPhrase: "audios/dormir_f.mp3" },
             { id: 5, title: "Baño", icon: "🚽", audioPrompt: "audios/bano_p.mp3", audioPhrase: "audios/bano_f.mp3" },
             { id: 6, title: "Te amo", icon: "🥰", audioPrompt: "audios/teamo_p.mp3", audioPhrase: "audios/teamo_f.mp3" }
         ];
@@ -193,7 +192,7 @@
             modalIcon.innerText = item.icon;
             modal.style.display = 'flex';
             
-            // Reproduce el audio grabado automáticamente al abrir
+            // Reproduce el audio de la palabra justo al abrir el popup
             playAudioPrompt();
         }
 
@@ -204,22 +203,20 @@
             }
         }
 
-        // Reproduce el audio de la palabra (estímulo)
         function playAudioPrompt() {
             if (selectedItem && selectedItem.audioPrompt) {
                 if (currentAudio) currentAudio.pause();
                 currentAudio = new Audio(selectedItem.audioPrompt);
-                currentAudio.play().catch(e => console.log("Falta archivo de audio o ruta inválida"));
+                currentAudio.play().catch(e => console.log("Audio no encontrado o cargando..."));
             }
         }
 
-        // Reproduce el audio de la frase completa (premio)
         function validateAndPlayPhrase() {
             closeModal();
             if (selectedItem && selectedItem.audioPhrase) {
                 if (currentAudio) currentAudio.pause();
                 currentAudio = new Audio(selectedItem.audioPhrase);
-                currentAudio.play().catch(e => console.log("Falta archivo de audio o ruta inválida"));
+                currentAudio.play().catch(e => console.log("Audio no encontrado o cargando..."));
             }
         }
 
