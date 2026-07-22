@@ -18,6 +18,12 @@
         h1 {
             color: #2563eb;
             text-align: center;
+            margin-bottom: 5px;
+        }
+        p {
+            color: #6b7280;
+            margin-top: 0;
+            margin-bottom: 25px;
         }
         .grid {
             display: grid;
@@ -33,7 +39,12 @@
             text-align: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             cursor: pointer;
-            border: 2px solid #ccc;
+            border: 2px solid #e5e7eb;
+            user-select: none;
+        }
+        .card:active {
+            transform: scale(0.95);
+            background-color: #f3f4f6;
         }
         .card-icon {
             font-size: 3.5rem;
@@ -55,11 +66,12 @@
         }
         .modal-content {
             background: white;
-            padding: 25px;
+            padding: 30px;
             border-radius: 20px;
             text-align: center;
             width: 85%;
             max-width: 350px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
         .btn {
             background-color: #10b981;
@@ -82,8 +94,8 @@
 </head>
 <body>
 
-    <h1>Comunicación Cotidiana v13</h1>
-    <p>Toca una opción</p>
+    <h1>Comunicación Cotidiana v14</h1>
+    <p>Selecciona una opción</p>
 
     <div class="grid" id="cardGrid"></div>
 
@@ -91,8 +103,8 @@
     <div class="modal" id="myModal">
         <div class="modal-content">
             <div id="mIcon" style="font-size: 4rem;">🥤</div>
-            <h2 id="mTitle" style="font-size: 2rem; color: #2563eb; margin: 10px 0;">Jugo</h2>
-            <p style="color: #555;">Toca el botón verde cuando estés listo:</p>
+            <h2 id="mTitle" style="font-size: 2.2rem; color: #2563eb; margin: 10px 0;">Jugo</h2>
+            <p style="color: #4b5563; font-size: 1.1rem;">Toca el botón verde para hablar:</p>
             
             <button class="btn" onclick="lanzarFrase()">✨ ¡Lo intenté!</button>
             <button class="btn btn-close" onclick="cerrarModal()">Cancelar</button>
@@ -115,7 +127,6 @@
         const mTitle = document.getElementById('mTitle');
         const mIcon = document.getElementById('mIcon');
 
-        // Dibujar tarjetas
         function iniciar() {
             grid.innerHTML = "";
             items.forEach(item => {
@@ -125,9 +136,14 @@
                     <div class="card-icon">${item.icon}</div>
                     <div class="card-title">${item.title}</div>
                 `;
-                div.onclick = function() {
+                
+                // Usamos tanto 'click' como 'touchend' para asegurar respuesta inmediata en pantallas táctiles y PC
+                div.addEventListener('click', () => abrirModal(item));
+                div.addEventListener('touchend', (e) => {
+                    e.preventDefault(); // Evita retrasos de doble toque en móviles
                     abrirModal(item);
-                };
+                });
+
                 grid.appendChild(div);
             });
         }
@@ -148,8 +164,7 @@
             if (itemActual && itemActual.audio) {
                 const reproductor = new Audio(itemActual.audio);
                 reproductor.play().catch(err => {
-                    console.log("Error reproduciendo audio:", err);
-                    alert("No se encontró el archivo de audio en la carpeta audios/");
+                    console.log("Error de audio:", err);
                 });
             }
         }
