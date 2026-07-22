@@ -130,7 +130,7 @@
 <body>
 
     <header>
-        <h1>Comunicación Cotidiana v6</h1>
+        <h1>Comunicación Cotidiana v7</h1>
         <p class="subtitle">Selecciona lo que necesitas</p>
     </header>
 
@@ -156,12 +156,12 @@
 
     <script>
         const items = [
-            { id: 1, title: "Jugo", icon: "🥤", audioPhrase: "audios/jugo_f.mp3" },
-            { id: 2, title: "Pan", icon: "🥙", audioPhrase: "audios/pan_f.mp3" },
-            { id: 3, title: "Tele", icon: "🖥️", audioPhrase: "audios/tv_f.mp3" },
-            { id: 4, title: "Dormir", icon: "🛌", audioPhrase: "audios/dormir_f.mp3" },
-            { id: 5, title: "Baño", icon: "🚽", audioPhrase: "audios/bano_f.mp3" },
-            { id: 6, title: "Te amo", icon: "🥰", audioPhrase: "audios/teamo_f.mp3" }
+            { id: 1, title: "Jugo", icon: "🥤", audioPrompt: "audios/jugo_p.mp3", audioPhrase: "audios/jugo_f.mp3" },
+            { id: 2, title: "Pan", icon: "🥙", audioPrompt: "audios/pan_p.mp3", audioPhrase: "audios/pan_f.mp3" },
+            { id: 3, title: "Tele", icon: "🖥️", audioPrompt: "audios/tv_p.mp3", audioPhrase: "audios/tv_f.mp3" },
+            { id: 4, title: "Dormir", icon: "🛌", audioPrompt: "audios/dormir_p.mp3", audioPhrase: "audios/dormir_f.mp3" },
+            { id: 5, title: "Baño", icon: "🚽", audioPrompt: "audios/bano_p.mp3", audioPhrase: "audios/bano_f.mp3" },
+            { id: 6, title: "Te amo", icon: "🥰", audioPrompt: "audios/teamo_p.mp3", audioPhrase: "audios/teamo_f.mp3" }
         ];
 
         let selectedItem = null;
@@ -173,7 +173,6 @@
         const modalWord = document.getElementById('modalWord');
         const modalIcon = document.getElementById('modalIcon');
 
-        // Cargar voces para el sintetizador
         function loadVoices() {
             if ('speechSynthesis' in window) {
                 voices = window.speechSynthesis.getVoices();
@@ -204,9 +203,9 @@
             modalIcon.innerText = item.icon;
             modal.style.display = 'flex';
             
-            // Forzamos el salto del audio asegurando que el popup ya se pintó
+            // Reproduce TU audio grabado de la palabra al abrir el popup
             setTimeout(() => {
-                speakSingleWordSynthesis();
+                playAudioPrompt();
             }, 100);
         }
 
@@ -220,9 +219,19 @@
             }
         }
 
-        // Sintetizador para repetir la palabra de forma guiada
+        // Reproduce el audio GRABADO de la palabra (al abrir el popup)
+        function playAudioPrompt() {
+            if (selectedItem && selectedItem.audioPrompt) {
+                if (currentAudio) currentAudio.pause();
+                currentAudio = new Audio(selectedItem.audioPrompt);
+                currentAudio.play().catch(e => console.log("Audio grabado de la palabra no encontrado."));
+            }
+        }
+
+        // Sintetizador de voz para el botón "Repetir palabra"
         function speakSingleWordSynthesis() {
             if ('speechSynthesis' in window && selectedItem) {
+                if (currentAudio) currentAudio.pause();
                 window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(selectedItem.title);
                 utterance.lang = 'es-ES';
@@ -237,13 +246,13 @@
             }
         }
 
-        // Frase completa con audio grabado
+        // Frase completa con audio grabado (al hacer clic en lo intenté)
         function validateAndPlayPhrase() {
             closeModal();
             if (selectedItem && selectedItem.audioPhrase) {
                 if (currentAudio) currentAudio.pause();
                 currentAudio = new Audio(selectedItem.audioPhrase);
-                currentAudio.play().catch(e => console.log("Audio grabado no encontrado, asegúrate de subirlo a la carpeta audios/"));
+                currentAudio.play().catch(e => console.log("Audio grabado de la frase no encontrado."));
             }
         }
 
