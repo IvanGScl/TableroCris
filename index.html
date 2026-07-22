@@ -64,7 +64,7 @@
             font-weight: bold;
             color: var(--text-color);
         }
-        /* Modal de interacción de voz */
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -130,7 +130,7 @@
 <body>
 
     <header>
-        <h1>Comunicación Cotidiana v2.2</h1>
+        <h1>Comunicación Cotidiana v4</h1>
         <p class="subtitle">Selecciona lo que necesitas</p>
     </header>
 
@@ -145,26 +145,29 @@
                 <h2 id="modalWord">Jugo</h2>
             </div>
             
-            <!-- Botón para escuchar la palabra como estímulo -->
-            <button class="btn btn-audio" onclick="playSingleWord()">🔊 Escuchar palabra</button>
+            <!-- Botón para escuchar el audio grabado de la palabra -->
+            <button class="btn btn-audio" onclick="playAudioPrompt()">🔊 Escuchar palabra (Grabada)</button>
             
-            <!-- Botón de validación para reproducir la frase completa -->
-            <button class="btn btn-success" onclick="validateAndSpeak()">✨ ¡Lo intenté! (Frase completa)</button>
+            <!-- Botón de validación para reproducir la frase completa grabada -->
+            <button class="btn btn-success" onclick="validateAndPlayPhrase()">✨ ¡Lo intenté! (Frase completa)</button>
             <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
         </div>
     </div>
 
     <script>
+        // Aquí puedes enlazar tus propios archivos de audio subidos a GitHub (ej: 'audio/jugo_palabra.mp3')
         const items = [
-            { id: 1, title: "Jugo", icon: "🥤", phrase: "Quiero tomar jugo" },
-            { id: 2, title: "Pan", icon: "🥙", phrase: "Quiero comer pan" },
-            { id: 3, title: "Tele", icon: "🖥️", phrase: "Quiero ver Televisión" },
-            { id: 4, title: "Dormir", icon: "🛌", phrase: "Quiero ir a dormir" },
-            { id: 5, title: "Baño", icon: "🚽", phrase: "Quiero ir al baño" },
-            { id: 6, title: "Te amo", icon: "🥰", phrase: "Te amo" }
+            { id: 1, title: "Jugo", icon: "🥤", audioPrompt: "audios/jugo_p.mp3", audioPhrase: "audios/jugo_f.mp3" },
+            { id: 2, title: "Pan", icon: "🥙", audioPrompt: "audios/pan_p.mp3", audioPhrase: "audios/pan_f.mp3" },
+            { id: 3, title: "TV", icon: "🖥️", audioPrompt: "audios/tv_p.mp3", audioPhrase: "audios/tv_f.mp3" },
+            { id: 4, title: "Dormir", icon: "🛌", audioPrompt: "audios/dormir_p.mp3", audioPhrase: "audios/dormir_f.mp3" },
+            { id: 5, title: "Baño", icon: "🚽", audioPrompt: "audios/bano_p.mp3", audioPhrase: "audios/bano_f.mp3" },
+            { id: 6, title: "Te amo", icon: "🥰", audioPrompt: "audios/teamo_p.mp3", audioPhrase: "audios/teamo_f.mp3" }
         ];
 
         let selectedItem = null;
+        let currentAudio = null;
+
         const grid = document.getElementById('cardGrid');
         const modal = document.getElementById('speechModal');
         const modalWord = document.getElementById('modalWord');
@@ -190,34 +193,33 @@
             modalIcon.innerText = item.icon;
             modal.style.display = 'flex';
             
-            // Opcional: reproduce la palabra automáticamente al abrir
-            playSingleWord();
+            // Reproduce el audio grabado automáticamente al abrir
+            playAudioPrompt();
         }
 
         function closeModal() {
             modal.style.display = 'none';
-        }
-
-        // Reproduce solo la palabra clave como estímulo de guía
-        function playSingleWord() {
-            if ('speechSynthesis' in window && selectedItem) {
-                window.speechSynthesis.cancel(); // Detiene cualquier audio anterior
-                const utterance = new SpeechSynthesisUtterance(selectedItem.title);
-                utterance.lang = 'es-ES';
-                utterance.rate = 0.8; // Un poco más pausado para que sirva de guía
-                window.speechSynthesis.speak(utterance);
+            if (currentAudio) {
+                currentAudio.pause();
             }
         }
 
-        // Valida el esfuerzo y emite la frase completa
-        function validateAndSpeak() {
+        // Reproduce el audio de la palabra (estímulo)
+        function playAudioPrompt() {
+            if (selectedItem && selectedItem.audioPrompt) {
+                if (currentAudio) currentAudio.pause();
+                currentAudio = new Audio(selectedItem.audioPrompt);
+                currentAudio.play().catch(e => console.log("Falta archivo de audio o ruta inválida"));
+            }
+        }
+
+        // Reproduce el audio de la frase completa (premio)
+        function validateAndPlayPhrase() {
             closeModal();
-            if ('speechSynthesis' in window && selectedItem) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(selectedItem.phrase);
-                utterance.lang = 'es-ES';
-                utterance.rate = 0.9;
-                window.speechSynthesis.speak(utterance);
+            if (selectedItem && selectedItem.audioPhrase) {
+                if (currentAudio) currentAudio.pause();
+                currentAudio = new Audio(selectedItem.audioPhrase);
+                currentAudio.play().catch(e => console.log("Falta archivo de audio o ruta inválida"));
             }
         }
 
