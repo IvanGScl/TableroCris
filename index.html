@@ -5,236 +5,156 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tablero de Comunicación - Cristóbal</title>
     <style>
-        :root {
-            --bg-color: #f4f6f9;
-            --card-bg: #ffffff;
-            --primary: #2563eb;
-            --text-color: #1f2937;
-            --accent: #10b981;
-        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #1f2937;
             margin: 0;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-        header {
-            margin-bottom: 20px;
-            text-align: center;
-        }
         h1 {
-            font-size: 1.8rem;
-            margin: 0;
-            color: var(--primary);
-        }
-        p.subtitle {
-            color: #6b7280;
-            font-size: 1rem;
+            color: #2563eb;
+            text-align: center;
         }
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
             width: 100%;
-            max-width: 600px;
+            max-width: 500px;
         }
         .card {
-            background-color: var(--card-bg);
+            background-color: white;
             border-radius: 16px;
             padding: 20px;
             text-align: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             cursor: pointer;
-            transition: transform 0.2s, background-color 0.2s;
-            border: 2px solid transparent;
-        }
-        .card:active {
-            transform: scale(0.95);
+            border: 2px solid #ccc;
         }
         .card-icon {
-            font-size: 3rem;
+            font-size: 3.5rem;
             margin-bottom: 10px;
         }
         .card-title {
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             font-weight: bold;
-            color: var(--text-color);
         }
         /* Modal */
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.7);
             justify-content: center;
             align-items: center;
-            padding: 20px;
             z-index: 100;
         }
         .modal-content {
             background: white;
-            padding: 30px;
+            padding: 25px;
             border-radius: 20px;
             text-align: center;
-            max-width: 420px;
-            width: 100%;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-        .modal-content h2 {
-            font-size: 2.2rem;
-            margin: 10px 0;
-            color: var(--primary);
-        }
-        .prompt-box {
-            background-color: #eff6ff;
-            border: 2px dashed #bfdbfe;
-            border-radius: 12px;
-            padding: 15px;
-            margin: 15px 0;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .prompt-box:active {
-            background-color: #dbeafe;
-        }
-        .prompt-text {
-            font-size: 1rem;
-            color: #1e40af;
-            font-weight: 600;
-            margin: 0 0 5px 0;
+            width: 85%;
+            max-width: 350px;
         }
         .btn {
-            background-color: var(--primary);
+            background-color: #10b981;
             color: white;
             border: none;
-            padding: 14px 20px;
-            font-size: 1.1rem;
+            padding: 15px;
+            font-size: 1.2rem;
             border-radius: 10px;
             cursor: pointer;
-            margin: 8px 0;
-            font-weight: bold;
             width: 100%;
+            font-weight: bold;
+            margin-top: 15px;
         }
-        .btn-success {
-            background-color: var(--accent);
-            font-size: 1.2rem;
-        }
-        .btn-secondary {
+        .btn-close {
             background-color: #e5e7eb;
-            color: var(--text-color);
+            color: #333;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Comunicación Cotidiana v12</h1>
-        <p class="subtitle">Selecciona lo que necesitas</p>
-    </header>
+    <h1>Comunicación Cotidiana v13</h1>
+    <p>Toca una opción</p>
 
     <div class="grid" id="cardGrid"></div>
 
-    <!-- Modal del Puente Vocal -->
-    <div class="modal" id="speechModal">
+    <!-- Modal -->
+    <div class="modal" id="myModal">
         <div class="modal-content">
-            <div id="modalIcon" style="font-size: 4rem;">💧</div>
+            <div id="mIcon" style="font-size: 4rem;">🥤</div>
+            <h2 id="mTitle" style="font-size: 2rem; color: #2563eb; margin: 10px 0;">Jugo</h2>
+            <p style="color: #555;">Toca el botón verde cuando estés listo:</p>
             
-            <!-- Caja central: Tocarla reproduce el audio grabado de la palabra -->
-            <div class="prompt-box" onclick="playAudioPrompt()">
-                <p class="prompt-text">🔊 Toca aquí para escuchar tu voz:</p>
-                <h2 id="modalWord">Tele</h2>
-            </div>
-            
-            <!-- Botón principal de éxito -->
-            <button class="btn btn-success" onclick="validateAndPlayPhrase()">✨ ¡Lo intenté! (Frase completa)</button>
-            <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+            <button class="btn" onclick="lanzarFrase()">✨ ¡Lo intenté!</button>
+            <button class="btn btn-close" onclick="cerrarModal()">Cancelar</button>
         </div>
     </div>
 
     <script>
         const items = [
-            { id: 1, title: "Jugo", icon: "🥤", audioPrompt: "audios/jugo_p.mp3", audioPhrase: "audios/jugo_f.mp3" },
-            { id: 2, title: "Pan", icon: "🥙", audioPrompt: "audios/pan_p.mp3", audioPhrase: "audios/pan_f.mp3" },
-            { id: 3, title: "Tele", icon: "🖥️", audioPrompt: "audios/tv_p.mp3", audioPhrase: "audios/tv_f.mp3" },
-            { id: 4, title: "Dormir", icon: "🛌", audioPrompt: "audios/dormir_p.mp3", audioPhrase: "audios/dormir_f.mp3" },
-            { id: 5, title: "Baño", icon: "🚽", audioPrompt: "audios/bano_p.mp3", audioPhrase: "audios/bano_f.mp3" },
-            { id: 6, title: "Te amo", icon: "🥰", audioPrompt: "audios/teamo_p.mp3", audioPhrase: "audios/teamo_f.mp3" }
+            { id: 1, title: "Jugo", icon: "🥤", frase: "Quiero tomar jugo", audio: "audios/jugo_f.mp3" },
+            { id: 2, title: "Pan", icon: "🥙", frase: "Quiero comer pan", audio: "audios/pan_f.mp3" },
+            { id: 3, title: "Tele", icon: "🖥️", frase: "Quiero ver Televisión", audio: "audios/tv_f.mp3" },
+            { id: 4, title: "Dormir", icon: "🛌", frase: "Quiero ir a dormir", audio: "audios/dormir_f.mp3" },
+            { id: 5, title: "Baño", icon: "🚽", frase: "Quiero ir al baño", audio: "audios/bano_f.mp3" },
+            { id: 6, title: "Te amo", icon: "🥰", frase: "Te amo", audio: "audios/teamo_f.mp3" }
         ];
 
-        let selectedItem = null;
-        let currentAudio = null;
-
+        let itemActual = null;
         const grid = document.getElementById('cardGrid');
-        const modal = document.getElementById('speechModal');
-        const modalWord = document.getElementById('modalWord');
-        const modalIcon = document.getElementById('modalIcon');
+        const modal = document.getElementById('myModal');
+        const mTitle = document.getElementById('mTitle');
+        const mIcon = document.getElementById('mIcon');
 
-        function renderCards() {
-            grid.innerHTML = '';
+        // Dibujar tarjetas
+        function iniciar() {
+            grid.innerHTML = "";
             items.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `
                     <div class="card-icon">${item.icon}</div>
                     <div class="card-title">${item.title}</div>
                 `;
-                card.onclick = () => openItem(item);
-                grid.appendChild(card);
+                div.onclick = function() {
+                    abrirModal(item);
+                };
+                grid.appendChild(div);
             });
         }
 
-        function openItem(item) {
-            selectedItem = item;
-            modalWord.innerText = item.title;
-            modalIcon.innerText = item.icon;
+        function abrirModal(item) {
+            itemActual = item;
+            mTitle.innerText = item.title;
+            mIcon.innerText = item.icon;
             modal.style.display = 'flex';
-            
-            // Disparar el audio grabado justo al abrir
-            setTimeout(() => {
-                playAudioPrompt();
-            }, 150);
         }
 
-        function closeModal() {
+        function cerrarModal() {
             modal.style.display = 'none';
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio.currentTime = 0;
-            }
         }
 
-        // Reproduce tu audio grabado de la palabra
-        function playAudioPrompt() {
-            if (selectedItem && selectedItem.audioPrompt) {
-                if (currentAudio) {
-                    currentAudio.pause();
-                }
-                currentAudio = new Audio(selectedItem.audioPrompt);
-                currentAudio.play().catch(err => {
-                    console.log("Audio de palabra no encontrado en la ruta:", selectedItem.audioPrompt);
+        function lanzarFrase() {
+            cerrarModal();
+            if (itemActual && itemActual.audio) {
+                const reproductor = new Audio(itemActual.audio);
+                reproductor.play().catch(err => {
+                    console.log("Error reproduciendo audio:", err);
+                    alert("No se encontró el archivo de audio en la carpeta audios/");
                 });
             }
         }
 
-        // Frase completa con audio grabado
-        function validateAndPlayPhrase() {
-            closeModal();
-            if (selectedItem && selectedItem.audioPhrase) {
-                if (currentAudio) {
-                    currentAudio.pause();
-                }
-                currentAudio = new Audio(selectedItem.audioPhrase);
-                currentAudio.play().catch(err => {
-                    console.log("Audio de frase no encontrado en la ruta:", selectedItem.audioPhrase);
-                });
-            }
-        }
-
-        renderCards();
+        iniciar();
     </script>
 </body>
 </html>
