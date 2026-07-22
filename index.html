@@ -83,6 +83,8 @@
             max-width: 420px;
             width: 100%;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            cursor: pointer; /* Indica que se puede tocar */
+            position: relative;
         }
         .modal-content h2 {
             font-size: 2.2rem;
@@ -130,15 +132,16 @@
 <body>
 
     <header>
-        <h1>Comunicación Cotidiana v8</h1>
+        <h1>Comunicación Cotidiana v10</h1>
         <p class="subtitle">Selecciona lo que necesitas</p>
     </header>
 
     <div class="grid" id="cardGrid"></div>
 
     <!-- Modal del Puente Vocal -->
-    <div class="modal" id="speechModal">
-        <div class="modal-content">
+    <div class="modal" id="speechModal" onclick="closeModal(event)">
+        <!-- El evento 'event.stopPropagation()' en este recuadro evita que los botones cierren o hagan cosas raras al tocarlos -->
+        <div class="modal-content" onclick="handleContentClick(event)">
             <div id="modalIcon" style="font-size: 4rem;">💧</div>
             <div class="prompt-box">
                 <p class="prompt-text">Dilo tú:</p>
@@ -146,11 +149,11 @@
             </div>
             
             <!-- Botón de repetir con Sintetizador de voz -->
-            <button class="btn btn-audio" onclick="speakSingleWordSynthesis()">🔊 Repetir palabra (Voz)</button>
+            <button class="btn btn-audio" onclick="speakSingleWordSynthesis()">🔊 Repetir palabra (Sintetizador)</button>
             
             <!-- Botón de validación con audio grabado -->
             <button class="btn btn-success" onclick="validateAndPlayPhrase()">✨ ¡Lo intenté! (Frase completa)</button>
-            <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+            <button class="btn btn-secondary" onclick="closeModalForce()">Cancelar</button>
         </div>
     </div>
 
@@ -201,15 +204,28 @@
             selectedItem = item;
             modalWord.innerText = item.title;
             modalIcon.innerText = item.icon;
-            
-            // Reproducimos el audio grabado justo al hacer clic en la tarjeta,
-            // aprovechando la interacción directa con la pantalla.
-            playAudioPrompt();
-
             modal.style.display = 'flex';
+            
+            // Intenta reproducir tu audio grabado de inmediato al abrir. 
+            // Como Cristóbal acaba de tocar la pantalla para abrir la tarjeta, 
+            // el navegador ya tiene el permiso y debería sonar perfecto.
+            playAudioPrompt();
         }
 
-        function closeModal() {
+        // Si toca dentro de la tarjeta blanca (pero fuera de los botones), reproduce tu audio
+        function handleContentClick(event) {
+            event.stopPropagation(); // Evita que se cierre el modal
+            playAudioPrompt();
+        }
+
+        function closeModal(event) {
+            // Si hace clic en la capa oscura de afuera, se cierra
+            if (event.target === modal) {
+                closeModalForce();
+            }
+        }
+
+        function closeModalForce() {
             modal.style.display = 'none';
             if (currentAudio) {
                 currentAudio.pause();
@@ -248,7 +264,7 @@
 
         // Frase completa con audio grabado
         function validateAndPlayPhrase() {
-            closeModal();
+            closeModalForce();
             if (selectedItem && selectedItem.audioPhrase) {
                 if (currentAudio) currentAudio.pause();
                 currentAudio = new Audio(selectedItem.audioPhrase);
