@@ -101,7 +101,7 @@
 </head>
 <body>
 
-    <h1>Comunicación v17</h1>
+    <h1>Comunicación v18</h1>
     <p>Toca una tarjeta</p>
 
     <!-- Grilla de tarjetas -->
@@ -118,9 +118,9 @@
             <div class="card-icon">🖥️</div>
             <div class="card-title">Tele</div>
         </div>
-        <div class="card" onclick="abrir('Dormir', '🛌', 'audios/dormir_f.mp3')">
+        <div class="card" onclick="abrir('Cama', '🛌', 'audios/dormir_f.mp3')">
             <div class="card-icon">🛌</div>
-            <div class="card-title">Dormir</div>
+            <div class="card-title">Cama</div>
         </div>
         <div class="card" onclick="abrir('Baño', '🚽', 'audios/bano_f.mp3')">
             <div class="card-icon">🚽</div>
@@ -173,7 +173,6 @@
             
             modal.style.display = 'flex';
 
-            // Habla la palabra con el sintetizador de inmediato al abrir
             decirPalabraSintetizador();
         }
 
