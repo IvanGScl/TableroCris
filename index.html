@@ -96,20 +96,24 @@
             padding: 15px;
             margin: 15px 0;
             cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .prompt-box:active {
+            background-color: #dbeafe;
         }
         .prompt-text {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #1e40af;
             font-weight: 600;
-            margin: 0;
+            margin: 0 0 5px 0;
         }
         .btn {
             background-color: var(--primary);
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 14px 20px;
             font-size: 1.1rem;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             margin: 8px 0;
             font-weight: bold;
@@ -117,20 +121,18 @@
         }
         .btn-success {
             background-color: var(--accent);
+            font-size: 1.2rem;
         }
         .btn-secondary {
             background-color: #e5e7eb;
             color: var(--text-color);
-        }
-        .btn-audio {
-            background-color: #f59e0b;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Comunicación Cotidiana v11</h1>
+        <h1>Comunicación Cotidiana v12</h1>
         <p class="subtitle">Selecciona lo que necesitas</p>
     </header>
 
@@ -141,14 +143,13 @@
         <div class="modal-content">
             <div id="modalIcon" style="font-size: 4rem;">💧</div>
             
-            <!-- Tocando esta caja de texto se reproduce tu audio grabado -->
+            <!-- Caja central: Tocarla reproduce el audio grabado de la palabra -->
             <div class="prompt-box" onclick="playAudioPrompt()">
-                <p class="prompt-text">Toca aquí para escuchar:</p>
+                <p class="prompt-text">🔊 Toca aquí para escuchar tu voz:</p>
                 <h2 id="modalWord">Tele</h2>
             </div>
             
-            <!-- Botones principales -->
-            <button class="btn btn-audio" onclick="speakSingleWordSynthesis()">🔊 Repetir con Voz Sintética</button>
+            <!-- Botón principal de éxito -->
             <button class="btn btn-success" onclick="validateAndPlayPhrase()">✨ ¡Lo intenté! (Frase completa)</button>
             <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
         </div>
@@ -166,22 +167,11 @@
 
         let selectedItem = null;
         let currentAudio = null;
-        let voices = [];
 
         const grid = document.getElementById('cardGrid');
         const modal = document.getElementById('speechModal');
         const modalWord = document.getElementById('modalWord');
         const modalIcon = document.getElementById('modalIcon');
-
-        function loadVoices() {
-            if ('speechSynthesis' in window) {
-                voices = window.speechSynthesis.getVoices();
-            }
-        }
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.onvoiceschanged = loadVoices;
-            loadVoices();
-        }
 
         function renderCards() {
             grid.innerHTML = '';
@@ -203,8 +193,10 @@
             modalIcon.innerText = item.icon;
             modal.style.display = 'flex';
             
-            // Intenta reproducir el audio grabado al abrir
-            playAudioPrompt();
+            // Disparar el audio grabado justo al abrir
+            setTimeout(() => {
+                playAudioPrompt();
+            }, 150);
         }
 
         function closeModal() {
@@ -212,9 +204,6 @@
             if (currentAudio) {
                 currentAudio.pause();
                 currentAudio.currentTime = 0;
-            }
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
             }
         }
 
@@ -226,26 +215,8 @@
                 }
                 currentAudio = new Audio(selectedItem.audioPrompt);
                 currentAudio.play().catch(err => {
-                    console.log("No se pudo reproducir el audio grabado:", err);
+                    console.log("Audio de palabra no encontrado en la ruta:", selectedItem.audioPrompt);
                 });
-            }
-        }
-
-        // Sintetizador de voz
-        function speakSingleWordSynthesis() {
-            if ('speechSynthesis' in window && selectedItem) {
-                if (currentAudio) currentAudio.pause();
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(selectedItem.title);
-                utterance.lang = 'es-ES';
-                utterance.rate = 0.8;
-                
-                const spanishVoices = voices.filter(v => v.lang.includes('es'));
-                if (spanishVoices.length > 0) {
-                    utterance.voice = spanishVoices[0];
-                }
-
-                window.speechSynthesis.speak(utterance);
             }
         }
 
@@ -258,7 +229,7 @@
                 }
                 currentAudio = new Audio(selectedItem.audioPhrase);
                 currentAudio.play().catch(err => {
-                    console.log("No se pudo reproducir el audio de la frase:", err);
+                    console.log("Audio de frase no encontrado en la ruta:", selectedItem.audioPhrase);
                 });
             }
         }
