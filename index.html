@@ -40,6 +40,10 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             cursor: pointer;
             border: 2px solid #cbd5e1;
+            transition: transform 0.1s;
+        }
+        .card:active {
+            transform: scale(0.95);
         }
         .card-icon {
             font-size: 3.5rem;
@@ -67,6 +71,14 @@
             width: 85%;
             max-width: 350px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            cursor: pointer; /* Indica que se puede pinchar para repetir */
+        }
+        .prompt-box {
+            background-color: #eff6ff;
+            border: 2px dashed #bfdbfe;
+            border-radius: 12px;
+            padding: 12px;
+            margin: 15px 0;
         }
         .btn {
             background-color: #10b981;
@@ -78,43 +90,43 @@
             cursor: pointer;
             width: 100%;
             font-weight: bold;
-            margin-top: 15px;
+            margin-top: 10px;
         }
         .btn-close {
             background-color: #e5e7eb;
             color: #333;
-            margin-top: 10px;
+            margin-top: 8px;
         }
     </style>
 </head>
 <body>
 
-    <h1>Comunicación v15 (Actualizado)</h1>
+    <h1>Comunicación v16</h1>
     <p>Toca una tarjeta</p>
 
-    <!-- Grilla fija en HTML para asegurar que los clics respondan de inmediato -->
+    <!-- Grilla de tarjetas -->
     <div class="grid">
-        <div class="card" onclick="abrir('Jugo', '🥤', 'audios/jugo_f.mp3')">
+        <div class="card" onclick="abrir('Jugo', '🥤', 'audios/jugo_p.mp3', 'audios/jugo_f.mp3')">
             <div class="card-icon">🥤</div>
             <div class="card-title">Jugo</div>
         </div>
-        <div class="card" onclick="abrir('Pan', '🥙', 'audios/pan_f.mp3')">
+        <div class="card" onclick="abrir('Pan', '🥙', 'audios/pan_p.mp3', 'audios/pan_f.mp3')">
             <div class="card-icon">🥙</div>
             <div class="card-title">Pan</div>
         </div>
-        <div class="card" onclick="abrir('Tele', '🖥️', 'audios/tv_f.mp3')">
+        <div class="card" onclick="abrir('Tele', '🖥️', 'audios/tv_p.mp3', 'audios/tv_f.mp3')">
             <div class="card-icon">🖥️</div>
             <div class="card-title">Tele</div>
         </div>
-        <div class="card" onclick="abrir('Dormir', '🛌', 'audios/dormir_f.mp3')">
+        <div class="card" onclick="abrir('Dormir', '🛌', 'audios/dormir_p.mp3', 'audios/dormir_f.mp3')">
             <div class="card-icon">🛌</div>
             <div class="card-title">Dormir</div>
         </div>
-        <div class="card" onclick="abrir('Baño', '🚽', 'audios/bano_f.mp3')">
+        <div class="card" onclick="abrir('Baño', '🚽', 'audios/bano_p.mp3', 'audios/bano_f.mp3')">
             <div class="card-icon">🚽</div>
             <div class="card-title">Baño</div>
         </div>
-        <div class="card" onclick="abrir('Te amo', '🥰', 'audios/teamo_f.mp3')">
+        <div class="card" onclick="abrir('Te amo', '🥰', 'audios/teamo_p.mp3', 'audios/teamo_f.mp3')">
             <div class="card-icon">🥰</div>
             <div class="card-title">Te amo</div>
         </div>
@@ -122,39 +134,59 @@
 
     <!-- Modal -->
     <div class="modal" id="myModal">
-        <div class="modal-content">
+        <div class="modal-content" onclick="reproducirPalabra()">
             <div id="mIcon" style="font-size: 4rem;">🥤</div>
-            <h2 id="mTitle" style="font-size: 2.2rem; color: #2563eb; margin: 10px 0;">Jugo</h2>
-            <p style="color: #4b5563; font-size: 1.1rem;">Toca el botón verde:</p>
             
-            <button class="btn" onclick="lanzarFrase()">✨ ¡Lo intenté!</button>
-            <button class="btn btn-close" onclick="cerrarModal()">Cancelar</button>
+            <div class="prompt-box">
+                <p style="margin: 0; color: #1e40af; font-size: 0.95rem; font-weight: bold;">🔊 Toca aquí para repetir:</p>
+                <h2 id="mTitle" style="font-size: 2rem; color: #2563eb; margin: 5px 0;">Jugo</h2>
+            </div>
+            
+            <button class="btn" onclick="lanzarFrase(event)">✨ ¡Lo intenté! (Frase)</button>
+            <button class="btn btn-close" onclick="cerrarModal(event)">Cancelar</button>
         </div>
     </div>
 
     <script>
-        let audioActualPath = "";
+        let audioPalabraRuta = "";
+        let audioFraseRuta = "";
         const modal = document.getElementById('myModal');
         const mTitle = document.getElementById('mTitle');
         const mIcon = document.getElementById('mIcon');
 
-        function abrir(titulo, icono, audioRuta) {
+        function abrir(titulo, icono, rutaPalabra, rutaFrase) {
             mTitle.innerText = titulo;
             mIcon.innerText = icono;
-            audioActualPath = audioRuta;
+            audioPalabraRuta = rutaPalabra;
+            audioFraseRuta = rutaFrase;
+            
             modal.style.display = 'flex';
+
+            // Al abrir mediante el clic en la tarjeta, reproducimos de inmediato la palabra grabada
+            reproducirPalabra();
         }
 
-        function cerrarModal() {
+        function reproducirPalabra() {
+            if (audioPalabraRuta) {
+                const rep = new Audio(audioPalabraRuta);
+                rep.play().catch(err => {
+                    console.log("Falta archivo de palabra:", audioPalabraRuta);
+                });
+            }
+        }
+
+        function cerrarModal(event) {
+            if (event) event.stopPropagation(); // Evita que dispare el evento de tocar la caja
             modal.style.display = 'none';
         }
 
-        function lanzarFrase() {
+        function lanzarFrase(event) {
+            event.stopPropagation(); // Evita que dispare el evento de tocar la caja
             cerrarModal();
-            if (audioActualPath) {
-                const reproductor = new Audio(audioActualPath);
-                reproductor.play().catch(err => {
-                    console.log("Error de audio:", err);
+            if (audioFraseRuta) {
+                const rep = new Audio(audioFraseRuta);
+                rep.play().catch(err => {
+                    console.log("Falta archivo de frase:", audioFraseRuta);
                 });
             }
         }
