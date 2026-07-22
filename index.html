@@ -64,7 +64,7 @@
             font-weight: bold;
             color: var(--text-color);
         }
-        /* Modal de interacción de voz (Paso 2 y 3) */
+        /* Modal de interacción de voz */
         .modal {
             display: none;
             position: fixed;
@@ -121,6 +121,10 @@
             background-color: #e5e7eb;
             color: var(--text-color);
         }
+        .btn-audio {
+            background-color: #f59e0b;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -137,12 +141,15 @@
         <div class="modal-content">
             <div id="modalIcon" style="font-size: 4rem;">💧</div>
             <div class="prompt-box">
-                <p class="prompt-text">Intenta decirlo en voz alta:</p>
+                <p class="prompt-text">Dilo tú:</p>
                 <h2 id="modalWord">Jugo</h2>
             </div>
             
-            <!-- Paso 3: Validación y Premio -->
-            <button class="btn btn-success" onclick="validateAndSpeak()">✨ ¡Lo intenté! (Reproducir)</button>
+            <!-- Botón para escuchar la palabra como estímulo -->
+            <button class="btn btn-audio" onclick="playSingleWord()">🔊 Escuchar palabra</button>
+            
+            <!-- Botón de validación para reproducir la frase completa -->
+            <button class="btn btn-success" onclick="validateAndSpeak()">✨ ¡Lo intenté! (Frase completa)</button>
             <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
         </div>
     </div>
@@ -182,19 +189,34 @@
             modalWord.innerText = item.title;
             modalIcon.innerText = item.icon;
             modal.style.display = 'flex';
+            
+            // Opcional: reproduce la palabra automáticamente al abrir
+            playSingleWord();
         }
 
         function closeModal() {
             modal.style.display = 'none';
         }
 
-        // Valida el esfuerzo y emite la frase completa (Premio / Acción cumplida)
+        // Reproduce solo la palabra clave como estímulo de guía
+        function playSingleWord() {
+            if ('speechSynthesis' in window && selectedItem) {
+                window.speechSynthesis.cancel(); // Detiene cualquier audio anterior
+                const utterance = new SpeechSynthesisUtterance(selectedItem.title);
+                utterance.lang = 'es-ES';
+                utterance.rate = 0.8; // Un poco más pausado para que sirva de guía
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Valida el esfuerzo y emite la frase completa
         function validateAndSpeak() {
             closeModal();
             if ('speechSynthesis' in window && selectedItem) {
+                window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(selectedItem.phrase);
                 utterance.lang = 'es-ES';
-                utterance.rate = 0.9; // Pausado y claro
+                utterance.rate = 0.9;
                 window.speechSynthesis.speak(utterance);
             }
         }
