@@ -83,8 +83,6 @@
             max-width: 420px;
             width: 100%;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            cursor: pointer; /* Indica que se puede tocar */
-            position: relative;
         }
         .modal-content h2 {
             font-size: 2.2rem;
@@ -97,6 +95,7 @@
             border-radius: 12px;
             padding: 15px;
             margin: 15px 0;
+            cursor: pointer;
         }
         .prompt-text {
             font-size: 1.1rem;
@@ -112,7 +111,7 @@
             font-size: 1.1rem;
             border-radius: 8px;
             cursor: pointer;
-            margin: 8px 5px;
+            margin: 8px 0;
             font-weight: bold;
             width: 100%;
         }
@@ -125,35 +124,33 @@
         }
         .btn-audio {
             background-color: #f59e0b;
-            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Comunicación Cotidiana v10</h1>
+        <h1>Comunicación Cotidiana v11</h1>
         <p class="subtitle">Selecciona lo que necesitas</p>
     </header>
 
     <div class="grid" id="cardGrid"></div>
 
     <!-- Modal del Puente Vocal -->
-    <div class="modal" id="speechModal" onclick="closeModal(event)">
-        <!-- El evento 'event.stopPropagation()' en este recuadro evita que los botones cierren o hagan cosas raras al tocarlos -->
-        <div class="modal-content" onclick="handleContentClick(event)">
+    <div class="modal" id="speechModal">
+        <div class="modal-content">
             <div id="modalIcon" style="font-size: 4rem;">💧</div>
-            <div class="prompt-box">
-                <p class="prompt-text">Dilo tú:</p>
+            
+            <!-- Tocando esta caja de texto se reproduce tu audio grabado -->
+            <div class="prompt-box" onclick="playAudioPrompt()">
+                <p class="prompt-text">Toca aquí para escuchar:</p>
                 <h2 id="modalWord">Tele</h2>
             </div>
             
-            <!-- Botón de repetir con Sintetizador de voz -->
-            <button class="btn btn-audio" onclick="speakSingleWordSynthesis()">🔊 Repetir palabra (Sintetizador)</button>
-            
-            <!-- Botón de validación con audio grabado -->
+            <!-- Botones principales -->
+            <button class="btn btn-audio" onclick="speakSingleWordSynthesis()">🔊 Repetir con Voz Sintética</button>
             <button class="btn btn-success" onclick="validateAndPlayPhrase()">✨ ¡Lo intenté! (Frase completa)</button>
-            <button class="btn btn-secondary" onclick="closeModalForce()">Cancelar</button>
+            <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
         </div>
     </div>
 
@@ -206,45 +203,35 @@
             modalIcon.innerText = item.icon;
             modal.style.display = 'flex';
             
-            // Intenta reproducir tu audio grabado de inmediato al abrir. 
-            // Como Cristóbal acaba de tocar la pantalla para abrir la tarjeta, 
-            // el navegador ya tiene el permiso y debería sonar perfecto.
+            // Intenta reproducir el audio grabado al abrir
             playAudioPrompt();
         }
 
-        // Si toca dentro de la tarjeta blanca (pero fuera de los botones), reproduce tu audio
-        function handleContentClick(event) {
-            event.stopPropagation(); // Evita que se cierre el modal
-            playAudioPrompt();
-        }
-
-        function closeModal(event) {
-            // Si hace clic en la capa oscura de afuera, se cierra
-            if (event.target === modal) {
-                closeModalForce();
-            }
-        }
-
-        function closeModalForce() {
+        function closeModal() {
             modal.style.display = 'none';
             if (currentAudio) {
                 currentAudio.pause();
+                currentAudio.currentTime = 0;
             }
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
             }
         }
 
-        // Reproduce el audio GRABADO de la palabra
+        // Reproduce tu audio grabado de la palabra
         function playAudioPrompt() {
             if (selectedItem && selectedItem.audioPrompt) {
-                if (currentAudio) currentAudio.pause();
+                if (currentAudio) {
+                    currentAudio.pause();
+                }
                 currentAudio = new Audio(selectedItem.audioPrompt);
-                currentAudio.play().catch(e => console.log("Audio grabado de la palabra no encontrado."));
+                currentAudio.play().catch(err => {
+                    console.log("No se pudo reproducir el audio grabado:", err);
+                });
             }
         }
 
-        // Sintetizador de voz para el botón "Repetir palabra"
+        // Sintetizador de voz
         function speakSingleWordSynthesis() {
             if ('speechSynthesis' in window && selectedItem) {
                 if (currentAudio) currentAudio.pause();
@@ -264,11 +251,15 @@
 
         // Frase completa con audio grabado
         function validateAndPlayPhrase() {
-            closeModalForce();
+            closeModal();
             if (selectedItem && selectedItem.audioPhrase) {
-                if (currentAudio) currentAudio.pause();
+                if (currentAudio) {
+                    currentAudio.pause();
+                }
                 currentAudio = new Audio(selectedItem.audioPhrase);
-                currentAudio.play().catch(e => console.log("Audio grabado de la frase no encontrado."));
+                currentAudio.play().catch(err => {
+                    console.log("No se pudo reproducir el audio de la frase:", err);
+                });
             }
         }
 
