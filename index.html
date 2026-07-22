@@ -64,7 +64,7 @@
             font-weight: bold;
             color: var(--text-color);
         }
-        /* Modal de interacción de voz */
+        /* Modal de interacción de voz (Paso 2 y 3) */
         .modal {
             display: none;
             position: fixed;
@@ -73,38 +73,53 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            z-index: 100;
         }
         .modal-content {
             background: white;
             padding: 30px;
             border-radius: 20px;
             text-align: center;
-            max-width: 400px;
+            max-width: 420px;
             width: 100%;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
         .modal-content h2 {
-            font-size: 2rem;
-            margin-bottom: 10px;
+            font-size: 2.2rem;
+            margin: 10px 0;
             color: var(--primary);
+        }
+        .prompt-box {
+            background-color: #eff6ff;
+            border: 2px dashed #bfdbfe;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .prompt-text {
+            font-size: 1.1rem;
+            color: #1e40af;
+            font-weight: 600;
+            margin: 0;
         }
         .btn {
             background-color: var(--primary);
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 12px 20px;
             font-size: 1.1rem;
             border-radius: 8px;
             cursor: pointer;
-            margin: 10px 5px;
+            margin: 8px 5px;
             font-weight: bold;
+            width: 100%;
+        }
+        .btn-success {
+            background-color: var(--accent);
         }
         .btn-secondary {
             background-color: #e5e7eb;
             color: var(--text-color);
-        }
-        .btn-success {
-            background-color: var(--accent);
         }
     </style>
 </head>
@@ -112,27 +127,27 @@
 
     <header>
         <h1>Comunicación Cotidiana</h1>
-        <p class="subtitle">Toca una opción para expresarte</p>
+        <p class="subtitle">Selecciona lo que necesitas</p>
     </header>
 
-    <div class="grid" id="cardGrid">
-        <!-- Las tarjetas se generan por JavaScript -->
-    </div>
+    <div class="grid" id="cardGrid"></div>
 
-    <!-- Modal de práctica de habla -->
+    <!-- Modal del Puente Vocal -->
     <div class="modal" id="speechModal">
         <div class="modal-content">
             <div id="modalIcon" style="font-size: 4rem;">💧</div>
-            <h2 id="modalWord">Agua</h2>
-            <p>Dilo en voz alta y presiona Reproducir</p>
-            <button class="btn btn-success" onclick="speakOutLoud()">🔊 Reproducir Mensaje</button>
-            <br>
-            <button class="btn btn-secondary" onclick="closeModal()">Cancelar / Volver</button>
+            <div class="prompt-box">
+                <p class="prompt-text">Intenta decirlo en voz alta:</p>
+                <h2 id="modalWord">Jugo</h2>
+            </div>
+            
+            <!-- Paso 3: Validación y Premio -->
+            <button class="btn btn-success" onclick="validateAndSpeak()">✨ ¡Lo intenté! (Reproducir)</button>
+            <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
         </div>
     </div>
 
     <script>
-        // Datos iniciales de ejemplo (ajustables a sus gustos reales)
         const items = [
             { id: 1, title: "Jugo", icon: "🥤", phrase: "Quiero tomar jugo" },
             { id: 2, title: "Pan", icon: "🥙", phrase: "Quiero comer pan" },
@@ -142,18 +157,16 @@
             { id: 6, title: "Te amo", icon: "🥰", phrase: "Te amo" }
         ];
 
-        let selectedPhrase = "";
-
+        let selectedItem = null;
         const grid = document.getElementById('cardGrid');
         const modal = document.getElementById('speechModal');
         const modalWord = document.getElementById('modalWord');
         const modalIcon = document.getElementById('modalIcon');
 
-        // Renderizar tarjetas
         function renderCards() {
             grid.innerHTML = '';
             items.forEach(item => {
-                const card = document.div = document.createElement('div');
+                const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
                     <div class="card-icon">${item.icon}</div>
@@ -165,7 +178,7 @@
         }
 
         function openItem(item) {
-            selectedPhrase = item.phrase;
+            selectedItem = item;
             modalWord.innerText = item.title;
             modalIcon.innerText = item.icon;
             modal.style.display = 'flex';
@@ -175,17 +188,15 @@
             modal.style.display = 'none';
         }
 
-        // Síntesis de voz nativa del navegador / dispositivo
-        function speakOutLoud() {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(selectedPhrase);
-                utterance.lang = 'es-ES';
-                utterance.rate = 0.9; // Velocidad natural y pausada
-                window.speechSynthesis.speak(utterance);
-            } else {
-                alert(selectedPhrase);
-            }
+        // Valida el esfuerzo y emite la frase completa (Premio / Acción cumplida)
+        function validateAndSpeak() {
             closeModal();
+            if ('speechSynthesis' in window && selectedItem) {
+                const utterance = new SpeechSynthesisUtterance(selectedItem.phrase);
+                utterance.lang = 'es-ES';
+                utterance.rate = 0.9; // Pausado y claro
+                window.speechSynthesis.speak(utterance);
+            }
         }
 
         renderCards();
