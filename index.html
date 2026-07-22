@@ -130,7 +130,7 @@
 <body>
 
     <header>
-        <h1>Comunicación Cotidiana v7</h1>
+        <h1>Comunicación Cotidiana v8</h1>
         <p class="subtitle">Selecciona lo que necesitas</p>
     </header>
 
@@ -201,12 +201,12 @@
             selectedItem = item;
             modalWord.innerText = item.title;
             modalIcon.innerText = item.icon;
-            modal.style.display = 'flex';
             
-            // Reproduce TU audio grabado de la palabra al abrir el popup
-            setTimeout(() => {
-                playAudioPrompt();
-            }, 100);
+            // Reproducimos el audio grabado justo al hacer clic en la tarjeta,
+            // aprovechando la interacción directa con la pantalla.
+            playAudioPrompt();
+
+            modal.style.display = 'flex';
         }
 
         function closeModal() {
@@ -219,7 +219,7 @@
             }
         }
 
-        // Reproduce el audio GRABADO de la palabra (al abrir el popup)
+        // Reproduce el audio GRABADO de la palabra
         function playAudioPrompt() {
             if (selectedItem && selectedItem.audioPrompt) {
                 if (currentAudio) currentAudio.pause();
@@ -246,7 +246,7 @@
             }
         }
 
-        // Frase completa con audio grabado (al hacer clic en lo intenté)
+        // Frase completa con audio grabado
         function validateAndPlayPhrase() {
             closeModal();
             if (selectedItem && selectedItem.audioPhrase) {
